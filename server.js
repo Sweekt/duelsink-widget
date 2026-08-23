@@ -122,7 +122,6 @@ app.get('/widget', async (req, res) => {
                         font-weight: 700; 
                         margin: 0; 
                         color: #ffffff; 
-                        text-shadow: 0 2px 4px rgba(0,0,0,0.8);
                         letter-spacing: 1px; /* Espacement des lettres pour le style tech */
                         text-transform: uppercase;
                     }
