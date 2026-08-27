@@ -9,7 +9,7 @@ Construit avec Node.js et Express, et entièrement conteneurisé via Docker pour
 * **Affichage en temps réel :** Récupération automatique du MMR actuel et de l'icône de rang correspondante.
 * **Historique visuel :** Affichage des 10 dernières parties sous forme de pastilles (Vert = Victoire, Rouge = Défaite).
 * **Filtrage par Queue :** Possibilité de cibler une file spécifique (ex: `core-bo1`) directement via l'URL.
-* **Sécurisé :** Le Token API est stocké côté serveur dans un `.env`, sans jamais être exposé dans OBS.
+* **Sécurisé :** Le Token API est stocké côté serveur dans un `backend/.env`, sans jamais être exposé dans OBS.
 
 ## 🛠️ Prérequis
 
@@ -22,7 +22,7 @@ Construit avec Node.js et Express, et entièrement conteneurisé via Docker pour
    Assurez-vous d'avoir les fichiers suivants dans votre répertoire : `server.js`, `package.json`, `Dockerfile`, et `docker-compose.yml`.
 
 2. **Configurer les variables d'environnement**
-   Créez un fichier `.env` à la racine du projet et insérez votre token d'authentification :
+   Créez un fichier `backend/.env` à la racine du projet et insérez votre token d'authentification :
    ```env
    DUELS_TOKEN=votre_bearer_token_ici
    ```
