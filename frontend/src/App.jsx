@@ -61,11 +61,20 @@ function App() {
             className="rounded-2xl py-3 px-5 w-max border border-white/20 border-t-white/40 border-l-white/30 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-white font-rajdhani flex items-center gap-5"
             style={{ background: `linear-gradient(135deg, ${config.colorFrom}A6 0%, ${config.colorTo}A6 100%)` }}
         >
-          <img
-              src={rankImageSrc}
-              alt="Rank"
-              className="w-[55px] h-[55px] object-contain drop-shadow-[0_0_10px_rgba(180,120,255,0.6)]"
-          />
+          <div className="w-[55px] h-[55px] relative flex-shrink-0">
+            <AnimatePresence mode="wait">
+              <motion.img
+                  key={rankImageSrc}
+                  src={rankImageSrc}
+                  alt="Rank"
+                  initial={{ opacity: 0, scale: 0.2, rotate: -45 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 1.5, filter: "blur(4px)" }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_0_12px_rgba(180,120,255,0.8)]"
+              />
+            </AnimatePresence>
+          </div>
 
           <div className="flex flex-col justify-center gap-.5">
             <div className="flex items-baseline text-[1.4rem] font-bold tracking-[1px] uppercase leading-none m-0">
