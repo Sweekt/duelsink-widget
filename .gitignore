@@ -1,5 +1,6 @@
 ﻿backend/.env
 backend/node_modules
+backend/prisma/dev.db
 .idea
 
 # Logs

@@ -1,8 +1,24 @@
+version: '3.8'
+
 services:
-  widget-obs:
-    build: .
+  backend:
+    build: ./backend
+    container_name: duels-backend
     ports:
-      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      # On monte le dossier prisma pour que ta base SQLite survive aux redémarrages
+      - ./backend/prisma:/app/prisma
     env_file:
-      - backend/.env
+      - ./backend/.env
     restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: duels-frontend
+    ports:
+      # On mappe le port 5173 de ton PC vers le port 80 de Nginx
+      - "5173:80"
+    restart: unless-stopped
+    depends_on:
+      - backend

@@ -1,4 +1,7 @@
-﻿FROM node:22-alpine
+﻿FROM node:22-slim
+
+# Installation de OpenSSL, requis par Prisma sur les distributions Debian
+RUN apt-get update -y && apt-get install -y openssl
 
 WORKDIR /app
 
@@ -7,7 +10,7 @@ RUN npm install
 
 COPY . .
 
-# Génération du client Prisma adapté à l'architecture Linux du conteneur
+# Génération du client Prisma
 RUN npx prisma generate
 
 # On lance le serveur Node
