@@ -23,7 +23,7 @@ Conçu spécifiquement pour le stream, avec un design "Glassmorphism" et des ani
 ## 🚀 Installation & Démarrage
 
 ### 1. Prérequis
-* Docker et Docker Compose installés (configurés avec WSL2 sous Windows).
+* Docker et Docker Compose installés.
 * Ton token d'API Duels.ink.
 
 ### 2. Configuration
@@ -62,19 +62,31 @@ docker compose up -d --build
 
 ## 🎛️ Automatisation Stream Deck (Windows)
 
-Pour éviter de surcharger l'API de Duels.ink quand tu ne streames pas, tu peux allumer et éteindre les conteneurs Docker de manière totalement invisible via ton Stream Deck.
+Pour éviter de surcharger l'API de Duels.ink quand tu ne streames pas, tu peux allumer et éteindre les conteneurs Docker via ton Stream Deck.
 
-1. Crée deux fichiers `.vbs` sur ton PC hôte (Windows) :
+1. Crée deux fichiers `.vbs` sur ton PC hôte 
+- Pour Windows + WSL2 :
+ 
+   **`start_widget.vbs` :**
+   ```vbscript
+   CreateObject("WScript.Shell").Run "wsl bash -c ""cd /chemin/vers/duelsink-widget && docker compose start""", 0, False
+   ```
+   
+   **`stop_widget.vbs` :**
+   ```vbscript
+   CreateObject("WScript.Shell").Run "wsl bash -c ""cd /chemin/vers/duelsink-widget && docker compose stop""", 0, False
+   ```
+- Pour Windows :
 
-**`start_widget.vbs` :**
-```vbscript
-CreateObject("WScript.Shell").Run "wsl bash -c ""cd /chemin/vers/duelsink-widget && docker compose start""", 0, False
-```
-
-**`stop_widget.vbs` :**
-```vbscript
-CreateObject("WScript.Shell").Run "wsl bash -c ""cd /chemin/vers/duelsink-widget && docker compose stop""", 0, False
-```
+   **`start_widget.vbs` :**
+   ```vbscript
+   CreateObject("WScript.Shell").Run "cmd.exe /c cd /d ""\chemin\vers\duelsink-widget"" && docker compose start", 0, False
+   ```
+   
+   **`stop_widget.vbs` :**
+   ```vbscript
+   CreateObject("WScript.Shell").Run "cmd.exe /c cd /d ""\chemin\vers\duelsink-widget"" && docker compose stop", 0, False
+   ```
 
 2. Sur ton Stream Deck, utilise un **Interrupteur Multi-Actions** (Hotkey Switch).
 3. Assigne **Système > Ouvrir** au premier état avec `start_widget.vbs`.
