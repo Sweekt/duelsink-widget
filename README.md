@@ -1,56 +1,83 @@
-# OBS Widget - Duels.ink Match History
+# Duels.ink OBS Widget V2
 
-Un widget web ultra-léger conçu pour OBS Studio, permettant d'afficher en temps réel son MMR, son rang, et l'historique de ses 10 dernières parties sur la plateforme [Duels.ink](https://duels.ink/).
+Un widget OBS élégant, en temps réel et conteneurisé, conçu pour afficher tes statistiques et ton historique de matchs **Disney Lorcana** via l'API de [Duels.ink](https://duels.ink/).
 
-Construit avec Node.js et Express, et entièrement conteneurisé via Docker pour une exécution propre en local.
+Conçu spécifiquement pour le stream, avec un design "Glassmorphism" et des animations fluides.
 
 ## ✨ Fonctionnalités
 
-* **Affichage en temps réel :** Récupération automatique du MMR actuel et de l'icône de rang correspondante.
-* **Historique visuel :** Affichage des 10 dernières parties sous forme de pastilles (Vert = Victoire, Rouge = Défaite).
-* **Filtrage par Queue :** Possibilité de cibler une file spécifique (ex: `core-bo1`) directement via l'URL.
-* **Sécurisé :** Le Token API est stocké côté serveur dans un `backend/.env`, sans jamais être exposé dans OBS.
+* 🔄 **Temps Réel (SSE) :** Mise à jour instantanée du widget sur OBS dès qu'une partie se termine, sans rechargement de la page.
+* 🎬 **Animations Avancées :** Transition fluide des rangs et carrousel d'historique (glissement et pulsation de la dernière partie) grâce à Framer Motion.
+* 📊 **Filtrage Intelligent :** Isolation des statistiques par saison (`season_name`) pour un winrate précis.
+* 🐳 **Conteneurisation :** Architecture multi-conteneurs (Node.js + Nginx) orchestrée par Docker Compose pour tourner de manière invisible en tâche de fond.
+* 🎛️ **Stream Deck Ready :** Scripts VBS inclus pour démarrer/stopper le widget silencieusement afin d'économiser les requêtes API hors-stream.
 
-## 🛠️ Prérequis
+## 🛠️ Stack Technique
 
-* [Docker](https://www.docker.com/) et Docker Compose installés sur votre machine (ou WSL).
-* Un Token d'API Bearer valide pour Duels.ink.
+* **Frontend :** React, Vite, Tailwind CSS v4, Framer Motion.
+* **Backend :** Node.js, Express, Axios, Prisma ORM (SQLite).
+* **Infrastructure :** Docker, Docker Compose, Nginx (pour servir le frontend).
 
-## 🚀 Installation et Lancement
+---
 
-1. **Cloner ou créer le projet**
-   Assurez-vous d'avoir les fichiers suivants dans votre répertoire : `server.js`, `package.json`, `Dockerfile`, et `docker-compose.yml`.
+## 🚀 Installation & Démarrage
 
-2. **Configurer les variables d'environnement**
-   Créez un fichier `backend/.env` à la racine du projet et insérez votre token d'authentification :
-   ```env
-   DUELS_TOKEN=votre_bearer_token_ici
-   ```
+### 1. Prérequis
+* Docker et Docker Compose installés (configurés avec WSL2 sous Windows).
+* Ton token d'API Duels.ink.
 
-3. **Lancer le conteneur Docker**
-   Ouvrez un terminal dans le dossier du projet et exécutez :
-   ```bash
-   docker compose up -d --build
-   ```
-   Le serveur local tournera sur le port `3000`.
+### 2. Configuration
+Crée un fichier `.env` dans le dossier `/backend` avec les informations suivantes :
 
-## 📺 Configuration dans OBS Studio
+```env
+DATABASE_URL="file:./dev.db"
+DUELS_TOKEN=ton_token_api_ici
+PORT=3001
 
-1. Dans votre scène OBS, ajoutez une nouvelle source de type **Navigateur (Browser Source)**.
-2. Configurez les paramètres suivants :
-    * **URL :** `http://localhost:3000/widget?queue=core-bo1`
-      *(Modifiez la valeur `queue` selon la file que vous souhaitez traquer).*
-    * **Largeur :** `350`
-    * **Hauteur :** `150` *(Laisse suffisamment de marge pour l'animation de pulsation).*
-    * **Routage audio :** Désactivé (non nécessaire).
-    * **Rafraîchir le navigateur quand la scène devient active :** Coché (recommandé).
+# Couleurs du dégradé
+THEME_COLOR_FROM=#142864
+THEME_COLOR_TO=#64148c
+```
 
-## 🎨 Personnalisation (server.js)
+### 3. Lancement via Docker
+À la racine du projet (là où se trouve le `docker-compose.yml`), exécute la commande suivante pour construire et lancer l'application en arrière-plan :
 
-* **Icônes de rang :** Le dictionnaire `RANK_IMAGES` en haut du fichier gère les images. Il accepte des chemins absolus (URL), des données SVG brutes, ou du Base64 (idéal pour limiter les requêtes).
-* **Paliers de MMR :** Modifiez la fonction `getRankImageSrc(mmr)` pour ajuster le changement d'icône en fonction des paliers officiels de Duels.ink.
+```bash
+docker compose up -d --build
+```
+*Le backend va automatiquement télécharger tout ton historique lors du premier lancement. Cela peut prendre quelques secondes.*
 
-## 👤 Auteur
+---
 
-**Benjamin Roy**
-*Développeur logiciel*
+## 🎥 Intégration dans OBS
+
+1. Ajoute une nouvelle **Source Navigateur**.
+2. Coche la case "Fichier local" si applicable, ou utilise l'URL réseau.
+3. Renseigne l'URL suivante : `http://localhost:5173/?queue=Core BO1 - Set 13`
+   *(Tu peux changer la variable `queue` dans l'URL pour afficher les statistiques d'un mode de jeu différent, par exemple `?queue=Core BO3 - Set 13`)*.
+4. Ajuste la largeur et la hauteur pour englober proprement le widget.
+5. Coche "Actualiser le navigateur quand la scène devient active" pour plus de sécurité.
+
+---
+
+## 🎛️ Automatisation Stream Deck (Windows)
+
+Pour éviter de surcharger l'API de Duels.ink quand tu ne streames pas, tu peux allumer et éteindre les conteneurs Docker de manière totalement invisible via ton Stream Deck.
+
+1. Crée deux fichiers `.vbs` sur ton PC hôte (Windows) :
+
+**`start_widget.vbs` :**
+```vbscript
+CreateObject("WScript.Shell").Run "wsl bash -c ""cd /chemin/vers/duelsink-widget && docker compose start""", 0, False
+```
+
+**`stop_widget.vbs` :**
+```vbscript
+CreateObject("WScript.Shell").Run "wsl bash -c ""cd /chemin/vers/duelsink-widget && docker compose stop""", 0, False
+```
+
+2. Sur ton Stream Deck, utilise un **Interrupteur Multi-Actions** (Hotkey Switch).
+3. Assigne **Système > Ouvrir** au premier état avec `start_widget.vbs`.
+4. Assigne **Système > Ouvrir** au second état avec `stop_widget.vbs`.
+
+Un appui lance le moteur en arrière-plan avant le stream, un second appui coupe tout proprement !
