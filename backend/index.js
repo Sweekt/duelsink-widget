@@ -93,10 +93,15 @@ app.get('/api/stream', (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
-    res.flushHeaders(); // Établit la connexion SSE
+    res.flushHeaders();
 
     clients.push(res);
+    const heartbeat = setInterval(() => {
+        res.write(':\n\n');
+    }, 30000);
+
     req.on('close', () => {
+        clearInterval(heartbeat);
         clients = clients.filter(client => client !== res);
     });
 });
@@ -118,7 +123,18 @@ app.get('/api/config', (req, res) => {
 // Route pour récupérer les stats de la queue demandée
 app.get('/api/stats', async (req, res) => {
     try {
-        const queue = req.query.queue || 'Core BO1 - Set 13';
+        let queue = req.query.queue || 'Core BO1 - Set 13';
+        switch (queue) {
+            case "BO1":
+                queue = 'Core BO1 - Set 13';
+                break;
+            case "BO3":
+                queue = 'Core BO3 - Set 13';
+                break;
+            default:
+                queue = 'Core BO1 - Set 13';
+                break;
+        }
 
         const last10Games = await prisma.match.findMany({
             where: { queueId: queue },

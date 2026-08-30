@@ -28,7 +28,11 @@ function App() {
   const [stats, setStats] = useState(null);
   const [config, setConfig] = useState({ colorFrom: '#142864', colorTo: '#64148c' });
   const searchParams = new URLSearchParams(window.location.search);
-  const targetQueue = searchParams.get('queue') || 'Core BO1 - Set 13';
+  const urlQueue = searchParams.get('queue') || 'BO1';
+
+  let targetQueue = 'Core BO1 - Set 13';
+  if (urlQueue === 'BO1') targetQueue = 'Core BO1 - Set 13';
+  else if (urlQueue === 'BO3') targetQueue = 'Core BO3 - Set 13';
 
   const fetchStats = () => {
     axios.get(`http://localhost:3001/api/stats?queue=${encodeURIComponent(targetQueue)}`)
